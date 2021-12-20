@@ -1,7 +1,6 @@
-raspberry/.idea/
-kostil.jpg
-kostil2_1.jpg
-kostil2_2.jpg
-raspberry/venv/
-.idea/
-raspberry/__pycache__/
+/**/.pio/**/*
+/**/CMakeListsPrivate.txt
+/**/cmake-build-*/**/*
+/**/.idea/**/*
+/**/venv/**/*
+/**/__pycache__/**/*
