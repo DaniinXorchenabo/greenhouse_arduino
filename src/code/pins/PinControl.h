@@ -113,7 +113,7 @@ public:
 private:
     unsigned long time_turn_on;
     bool is_work_for_time = false;
-    int delay_t;
+    unsigned int delay_t;
     int pin_filling = 0;
     //int over_pin_fill = 0;
     int priority = 10000; // любое число|с сайта|с мобильного приложения|с разбери|с датчиков или по времени|

@@ -7,7 +7,7 @@
 #include <code/consts.h>
 #include <code/pins/AnalogReadPin.h>
 
-
+extern int POLIV_DELAY;
 extern std::map<String, PinControl> dig_pins;
 extern std::map<String, sens_val_strucr> sensors_val;
 

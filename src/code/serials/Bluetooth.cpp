@@ -6,6 +6,8 @@
 #include <code/consts.h>
 #include "Bluetooth.h"
 
+
+extern int POLIV_DELAY;
 extern std::map<String, PinControl> dig_pins;
 
 Bluetooth::Bluetooth(SoftwareSerial &blut_obj) {
