@@ -30,4 +30,4 @@ add_custom_target(
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-add_executable(Z_DUMMY_TARGET ${SRC_LIST})
+add_executable(Z_DUMMY_TARGET ${SRC_LIST} src/code/main.cpp src/code/pins/PinControl.cpp src/code/pins/PinControl.h src/code/pins/AnalogReadPin.cpp src/code/pins/AnalogReadPin.h src/code/serials/RaspberryPiControl.cpp src/code/serials/RaspberryPiControl.h src/code/serials/EspControl.cpp src/code/serials/EspControl.h src/code/serials/Bluetooth.cpp src/code/serials/Bluetooth.h src/code/pins/ActivateWork.cpp src/code/pins/ActivateWork.h src/code/consts.h)
