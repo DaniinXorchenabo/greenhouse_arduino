@@ -10,7 +10,7 @@
 #include <map>
 #include "DHT.h"
 
-
+unsigned long time_turn_on;
 
 void setup() {
     // put your setup code here, to run once:
@@ -27,7 +27,7 @@ void _loop() {
     Serial.println("--");
 }
 
-void loop(){
+void loop() {
 
 //    Serial.print("-");
 
@@ -38,4 +38,17 @@ void loop(){
         Serial.println("rpi_get: " + data);
     }
     delay(100);
+
+    if (millis() - time_turn_on > 2000) {
+        time_turn_on = millis();
+        String data = String("") +
+               "{\"metrics\": {" +
+               "\"temperature\":" + (String) rand() + ", " +
+               "\"humidity\": " + (String) rand() + ", " +
+               "\"root_humidity\": " + (String) rand() + ", " +
+               "\"water_level\": " + (String) rand() + ", " +
+               "\"water_humidity_level\": " + (String) rand() +
+               "}";
+        Serial.println(data);
+    }
 }
