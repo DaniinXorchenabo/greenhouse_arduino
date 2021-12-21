@@ -48,6 +48,7 @@ void loop() {
                "\"root_humidity\": " + (String) rand() + ", " +
                "\"water_level\": " + (String) rand() + ", " +
                "\"water_humidity_level\": " + (String) rand() +
+               "}"
                "}";
         Serial.println(data);
     }
