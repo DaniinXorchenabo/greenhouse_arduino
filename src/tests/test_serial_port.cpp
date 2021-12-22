@@ -45,6 +45,9 @@ void loop() {
                 if (!doc["set"]["led"].isNull()) {
                     serializeJson(doc["set"]["led"], Serial);
                     Serial.print("\n");
+                    int8_t led_ = doc["set"]["led"];
+                    Serial.print(led_ + 100);
+                    Serial.println(" %");
                 }
                 if (!doc["set"]["reb_blue_led"].isNull()) {
                     serializeJson(doc["set"]["reb_blue_led"], Serial);;
