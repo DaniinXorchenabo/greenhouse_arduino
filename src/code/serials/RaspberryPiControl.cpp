@@ -3,6 +3,7 @@
 //
 
 #include "RaspberryPiControl.h"
+#include <ArduinoJson.h>
 
 #include <code/pins/PinControl.h>
 #include <code/pins/AnalogReadPin.h>
@@ -11,9 +12,15 @@ extern std::map<String, PinControl> dig_pins;
 extern std::map<String, sens_val_strucr> sensors_val;
 extern int POLIV_DELAY;
 
-RaspberryPiControl::RaspberryPiControl(SoftwareSerial &ras) {
+//RaspberryPiControl::RaspberryPiControl(SoftwareSerial &ras) {
+//    raspb = &ras;
+//    raspb->begin(9600);
+//    write_raspb("I started (uno)");
+//}
+
+RaspberryPiControl::RaspberryPiControl(HardwareSerial &ras) {
     raspb = &ras;
-    raspb->begin(9600);
+//    raspb->begin(9600);
     write_raspb("I started (uno)");
 }
 
@@ -34,24 +41,24 @@ void RaspberryPiControl::over_read_raspb() { // считывается стро�
 }
 
 String RaspberryPiControl::read_raspb() {
-    Serial.print("-");
+//    Serial.print("-");
 
-    if (!raspb->isListening()) {
-        bool useless = raspb->listen();
-    }
+//    if (!raspb->isListening()) {
+//        bool useless = raspb->listen();
+//    }
 
     if (raspb->available()) {
         Serial.println("разбери что-то прислал...");
-        String data = "";
-        raspb->setTimeout(50);
-        data = raspb->readString();
-        /*
-        while (raspb->available() > 0){
-          data += (String)raspb->peek();
-          if (raspb->read() == '\n'){break;}
-        }*/
+
+//        raspb->setTimeout(10);
+        String data = raspb->readStringUntil('\n');
+//        String data;
+//        while (raspb->available() > 0){
+//          data += (String)raspb->peek();
+//          if (raspb->read() == '\n'){break;}
+//        }
         //delay(50);
-        Serial.println("raspb_get: " + data);
+//        Serial.println("raspb_get: " + data);
         return data;
     }
     return "";
@@ -59,8 +66,8 @@ String RaspberryPiControl::read_raspb() {
 
 //=======! Обработка полученных данных !=======
 void RaspberryPiControl::data_processing(String str) { // обработка строки
-    write_raspb("I get: " + str);
-    Serial.println("Получил от разбери: " + str);
+    write_raspb("I get: " + str + "%%*");
+//    Serial.println("Получил от разбери: " + str);
     str_raspb = str;
     if (str == "WhiteLedHIGH") {
         if (dig_pins.find("whiteLed") != dig_pins.end()) {
@@ -87,6 +94,76 @@ void RaspberryPiControl::data_processing(String str) { // обработка с�
 
     if (str_raspb != str) {
     }
+
+
+    DynamicJsonDocument doc(2048);
+    deserializeJson(doc, str);
+    if (!doc.isNull()) {
+        if (!doc["set"].isNull()) {
+            if (!doc["set"]["led"].isNull()) {
+                int8_t led_ = doc["set"]["led"];
+                if (dig_pins.find("whiteLed") != dig_pins.end()) {
+                    dig_pins.find("whiteLed")->second.PWM_mode((int)(led_ * 255 / 100));
+//                    dig_pins.find("whiteLed")->second.
+                }
+
+            }
+            if (!doc["set"]["reb_blue_led"].isNull()) {
+                int8_t led_ = doc["set"]["reb_blue_led"];
+                if (dig_pins.find("fitoLed") != dig_pins.end()) {
+                    dig_pins.find("fitoLed")->second.PWM_mode((int)(led_ * 255 / 100));
+//                    dig_pins.find("fitoLed")->second.edit_status_pin(led_ >= 50, 11, true);
+                }
+            }
+            if (!doc["set"]["humidity"].isNull()) {
+//                serializeJson(doc["set"]["humidity"], Serial);;
+//                Serial.print("\n");
+            }
+            if (!doc["set"]["root_humidity"].isNull()) {
+//                serializeJson(doc["set"]["root_humidity"], Serial);;
+//                Serial.print("\n");
+            }
+            if (!doc["set"]["temperature"].isNull()) {
+//                serializeJson(doc["set"]["temperature"], Serial);;
+//                Serial.print("\n");
+            }
+            if (!doc["set"]["fan"].isNull()) {
+                bool fan_aur = doc["set"]["fan"];
+                Serial.println("--" +  (String)fan_aur);
+                serializeJson(doc["set"]["fan"],Serial);
+                Serial.println();
+                if (dig_pins.find("fan_air") != dig_pins.end()) {
+                    dig_pins.find("fan_air")->second.set_priority(10);
+                    dig_pins.find("fan_air")->second.edit_status_pin(fan_aur, 11, false);
+                }
+            }
+            if (!doc["set"]["root_fan"].isNull()) {
+                bool fan_root = doc["set"]["root_fan"];
+                if (dig_pins.find("fan_root") != dig_pins.end()) {
+                    dig_pins.find("fan_air")->second.set_priority(10);
+                    dig_pins.find("fan_root")->second.edit_status_pin(fan_root, 11, false);
+                }
+            }
+        }
+        if (!doc["get"].isNull()) {
+
+        }
+        if (!doc["action"].isNull()) {
+            if (!doc["action"]["water"].isNull()) {
+                bool water = doc["action"]["water"];
+                Serial.println(water);
+                if (dig_pins.find("poliv") != dig_pins.end() && water) {
+                    Serial.println("полив должен работать");
+                    dig_pins.find("poliv")->second.turn_on_for_time(POLIV_DELAY, 11);
+                }
+            }
+        }
+//        Serial.println("-----");
+//        serializeJson(doc, Serial);
+//        Serial.println("\ninto if");
+    }
+
+
 }
 
 String RaspberryPiControl::get_val_sens() {
@@ -112,7 +189,7 @@ void RaspberryPiControl::regular_send() {
                     "\"root_humidity\": " + (String) sensors_val["root_hum"].value + ", " +
                     "\"water_level\": " + (String) sensors_val["level_poliv"].value + ", " +
                     "\"water_humidity_level\": " + (String) sensors_val["level_vapor"].value +
-                "}");
+                "}}");
     }
 }
 

@@ -16,12 +16,15 @@
 #define GREENHOUSE_ARDUINO_RASPBERRYPICONTROL_H
 
 
+
 class RaspberryPiControl{
 public:
-    SoftwareSerial *raspb;
+//    SoftwareSerial *raspb;
+    HardwareSerial *raspb;
     String start_day = "None";
 
     RaspberryPiControl(SoftwareSerial &ras);
+    RaspberryPiControl(HardwareSerial &ras);
 
     void raspb_update();
 
