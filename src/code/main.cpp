@@ -35,9 +35,9 @@ int8_t TEMP_FAN_DISACTIVATION_LEVLE = TEMP_FAN_ACTIVATION_LEVLE - 2;
 using namespace std;
 
 DHT dht(7, DHT11);
-SoftwareSerial raspb(53, 51);
-SoftwareSerial blut(52, 50);
-
+//SoftwareSerial raspb(53, 51);
+//SoftwareSerial blut(52, 50);
+//RaspberryPiControl rasClass(raspb);
 
 
 
@@ -45,15 +45,15 @@ std::map<String, PinControl> dig_pins;
 std::map<String, sens_val_strucr> sensors_val;
 
 
-RaspberryPiControl rasClass(raspb);
-EspControl espControl;
-Bluetooth bluetooth(blut);
+RaspberryPiControl rasClass(Serial);
+//EspControl espControl;
+//Bluetooth bluetooth(blut);
 
 ActivateWork activate_vapor("vapor", "hum", VAPOR_ACTIVATION_LEVLE, VAPOR_DISACTIVATION_LEVLE,
                             1); //и для испарителя и для его вентилятора
 ActivateWork activate_root_fan("fan_root", "gas", GAS_DISACTIVATION_LEVLE, GAS_ACTIVATION_LEVLE, 2);
-ActivateWork activate_temp_fan("fan_air", "temp", TEMP_FAN_DISACTIVATION_LEVLE, TEMP_FAN_ACTIVATION_LEVLE, 2);
-ActivateWork activate_poliv("poliv", "root_hum", POLIV_LOW_LEVEL, 0, 3);
+//ActivateWork activate_temp_fan("fan_air", "temp", TEMP_FAN_DISACTIVATION_LEVLE, TEMP_FAN_ACTIVATION_LEVLE, 2);
+//ActivateWork activate_poliv("poliv", "root_hum", POLIV_LOW_LEVEL, 0, 3);
 ActivateWork activate_test("test", "test", 1, 2, 100);
 
 extern int __bss_end;
@@ -85,9 +85,9 @@ void update_sensors_value() {
         if (data != -1) {
             it->second.value = (float) data;
         }
-        Serial.print(String(it->first) + " " + String(it->second.value) + "\t");
+//        Serial.print(String(it->first) + " " + String(it->second.value) + "\t");
     }
-    Serial.println();
+//    Serial.println();
 }
 
 
@@ -104,13 +104,14 @@ void setup() {
 
 
     //dig_pins["air"] = PinControl(30);
-    dig_pins["fan_air"] = PinControl(33, activate_temp_fan);
+//    dig_pins["fan_air"] = PinControl(33, activate_temp_fan);
+    dig_pins["fan_air"] = PinControl(33);
     dig_pins["vapor"] = PinControl(30, activate_vapor);
     dig_pins["fan_root"] = PinControl(28, activate_root_fan);//4
     dig_pins["fan_vapor"] = PinControl(26, activate_vapor);
-    dig_pins["poliv"] = PinControl(24, activate_poliv);
+    dig_pins["poliv"] = PinControl(13, LOW /*настоящий: 24, activate_poliv*/);
 
-    dig_pins["test"] = PinControl(13, (boolean) LOW); //, activate_test
+//    dig_pins["test"] = PinControl(13, LOW); //, activate_test
 
     Serial.println("000");
     sensors_val["temp"] = (sens_val_strucr) {23, AnalogReadPin(dht, (String) "t")};
@@ -122,13 +123,15 @@ void setup() {
     sensors_val["level_poliv"] = (sens_val_strucr) {500, AnalogReadPin(1)};
     sensors_val["level_vapor"] = (sens_val_strucr) {500, AnalogReadPin(2)};
     sensors_val["root_hum"] = (sens_val_strucr) {80, AnalogReadPin(3, true)};
+
+
     /*
     Serial.println("rtrtr ");
     //rasClass.test();
     Serial.println("rtrtr ");
     Serial.println(sensors_val["gas"].value);
     */
-    dig_pins.find("fan_air")->second.edit_status_pin(true);
+//    dig_pins.find("fan_air")->second.edit_status_pin(true);
 
 /*
 dig_pins.find("test")->second.set_priority(39);//19000
@@ -157,9 +160,9 @@ void loop() {
     update_pin();
     rasClass.raspb_update();
     //bluetooth.update_blut();
-    espControl.update_esp();
+//    espControl.update_esp();
     update_sensors_value();
-    delay(500);
+//    delay(500);
 
 }
 
