@@ -71,10 +71,10 @@ void ActivateWork::standart_activation_func(String key_n){ // 1
 void ActivateWork::revers_standart_activation_func(String key_n){ // 2
     if (sensors_val.find(key_senser) !=  sensors_val.end()){
         if (sensors_val.find(key_senser)->second.value >= high_level){
-            PinControl::static_edit_status_pin(key_n, true, 0, true);
+            PinControl::static_edit_status_pin(key_n, true, 0, false);
         }
         else if (sensors_val.find(key_senser)->second.value < low_level){
-            PinControl::static_edit_status_pin(key_n, false, 0, true);
+            PinControl::static_edit_status_pin(key_n, false, 0, false);
         }
     }
 }
